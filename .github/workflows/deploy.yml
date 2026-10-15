@@ -19,7 +19,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # always build the newest main, so re-running an old run can't republish old content
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 22
