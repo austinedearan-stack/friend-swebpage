@@ -1,0 +1,18 @@
+import { useState } from 'react'
+import { fill } from '../lib/content.js'
+import { Heart } from './Doodles.jsx'
+
+export default function Footer({ eggs, vars, pick }) {
+  const [compliment, setCompliment] = useState('')
+  return (
+    <footer className="site-footer">
+      <button className="link-btn compliment-btn" onClick={() => setCompliment(fill(pick('compliment', eggs.compliments), vars))}>
+        need a random compliment?
+      </button>
+      <p className="compliment hand" aria-live="polite">{compliment}</p>
+      <p className="footer-note">
+        <Heart size={16} /> {fill(eggs.footer, vars)}
+      </p>
+    </footer>
+  )
+}

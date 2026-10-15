@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "admin": {
+    "passphraseHash": "1f594209378dce842f1d3320e63ee16fb04d2ad839ea2c5fbfa1e4306835031d"
+  },
+  "site": {
+    "title": "Austine checking in",
+    "activeMode": "personal",
+    "visitorCanSwitchMode": false,
+    "defaultTheme": { "preset": "scrapbook", "overrides": {} }
+  },
+  "modes": {
+    "personal": {
+      "label": "for Brenda",
+      "recipientName": "Brenda",
+      "welcome": {
+        "kicker": "a tiny corner of the internet, for {name}",
+        "greetingsFirstVisit": ["heyyy, you."],
+        "greetingsReturning": [
+          "oh hey, you're back.",
+          "back again? i'm flattered.",
+          "hi hi hi. again.",
+          "welcome back to the least necessary website.",
+          "{name}! you came back!"
+        ],
+        "intro": "Just popping in to see how your day is going. No pressure, no formalities. Just you, me, and this slightly unnecessary website.",
+        "startLabel": "start the check-in",
+        "tomorrowLinkLabel": "skip to the tomorrow question",
+        "noteText": "made with questionable effort & a lot of care",
+        "polaroidCaption": "you, probably, being great"
+      },
+      "checkin": {
+        "heading": "How are we actually doing?",
+        "subheading": "pick the one that's closest. no wrong answers. (ok, one wrong answer: lying.)",
+        "changeLabel": "change my answer",
+        "moods": [
+          {
+            "id": "good",
+            "icon": "sun",
+            "label": "Pretty good.",
+            "description": "Things are going suspiciously well.",
+            "responses": [
+              "Love that for you. Write down whatever you did today so we can do it again.",
+              "Pretty good?? Look at you. Thriving. Iconic, honestly.",
+              "Okay, someone's having a day. Keep that energy, it suits you.",
+              "Noted. I'll be taking full credit for this, obviously."
+            ]
+          },
+          {
+            "id": "surviving",
+            "icon": "cloud",
+            "label": "Just surviving.",
+            "description": "Upright. Functional. Mostly.",
+            "responses": [
+              "Surviving still counts. It's literally the main objective.",
+              "Some days are just 'get to the end' days, and you're doing it. Proud of you.",
+              "Surviving is underrated. Snacks and an early night are strongly recommended.",
+              "Honestly? Respectable. Medium days build character, apparently."
+            ]
+          },
+          {
+            "id": "fumes",
+            "icon": "battery",
+            "label": "Running on fumes.",
+            "description": "Battery at 3%. Please plug me in.",
+            "responses": [
+              "Official instruction: water, food, and doing absolutely nothing for a bit.",
+              "Fumes are technically still fuel. But you deserve a full tank, so rest when you can.",
+              "You've been carrying a lot. Put some of it down tonight. It'll still be there tomorrow (sadly).",
+              "Low battery mode activated. Dim the brightness, close the unnecessary apps, lie down."
+            ]
+          },
+          {
+            "id": "chaos",
+            "icon": "storm",
+            "label": "Absolute chaos.",
+            "description": "Everything, everywhere, all at once.",
+            "responses": [
+              "Chaos? Want to tell me about it? I'm one text away.",
+              "Deep breath. The chaos is temporary. You, however, are permanent and great.",
+              "Okay, chaos coordinator. One thing at a time. The rest can wait its turn.",
+              "Sounds like a lot. Sending emotional support from right here."
+            ]
+          }
+        ]
+      },
+      "tomorrow": {
+        "heading": "So… are we ready for tomorrow?",
+        "note": "this is not a contract. nothing you click here can be used against you.",
+        "options": [
+          {
+            "id": "yes",
+            "label": "Yes, absolutely.",
+            "celebrate": true,
+            "responses": [
+              "Look at you, all prepared. Tomorrow doesn't stand a chance.",
+              "Confidence! I love it. Go show tomorrow who's boss."
+            ]
+          },
+          {
+            "id": "mentally",
+            "label": "Mentally? No.",
+            "celebrate": false,
+            "responses": [
+              "Valid. Physically present is a great start. Mentally can join later.",
+              "Nobody's mentally ready for anything. We just show up and wing it."
+            ]
+          },
+          {
+            "id": "figure",
+            "label": "We will figure it out.",
+            "celebrate": false,
+            "responses": [
+              "That's the spirit. Figuring it out is basically the whole plan of adulthood.",
+              "Exactly. And if it gets weird, you know who to text."
+            ]
+          },
+          {
+            "id": "reschedule",
+            "label": "Can we reschedule life?",
+            "celebrate": false,
+            "responses": [
+              "I've filed the request. Life said no, but it offered snacks as compensation.",
+              "Unfortunately life is fully booked. You can, however, take a nap."
+            ]
+          }
+        ],
+        "closingTitle": "one last thing",
+        "closingMessage": "Whatever tomorrow looks like, you're going to handle it the way you always do: better than you think you will. Text me after?",
+        "signoff": "— Austine"
+      },
+      "extras": {
+        "heading": "little extras",
+        "intro": "press a button, get a thing. that's the whole system.",
+        "buckets": [
+          {
+            "id": "compliment",
+            "button": "a compliment",
+            "lines": [
+              "Your laugh is genuinely one of the best sounds.",
+              "You make hard things look easier than they are.",
+              "You have excellent taste. Evidence: you're reading this.",
+              "You're more appreciated than you know."
+            ]
+          },
+          {
+            "id": "reminder",
+            "button": "a tiny reminder",
+            "lines": [
+              "Drink some water. Yes, now.",
+              "Unclench your jaw. Drop your shoulders. There you go.",
+              "You're allowed to rest before you're exhausted.",
+              "Eat something that isn't just snacks. (Snacks also allowed.)"
+            ]
+          },
+          {
+            "id": "joke",
+            "button": "inside joke",
+            "lines": [
+              "(edit me) put one of your inside jokes here",
+              "(edit me) that thing that happened that one time"
+            ]
+          }
+        ]
+      },
+      "rps": {
+        "heading": "rock, paper, scissors?",
+        "intro": "winner gets bragging rights. loser also gets bragging rights. i'm not strict.",
+        "win": ["You won. I demand a rematch immediately.", "Wow. Okay. Didn't want to win anyway.", "Beginner's luck. Clearly."],
+        "lose": ["I win! Say it with me: Austine is the champion.", "Ha! Maybe stick to being lovely instead.", "Victory is mine. I'll be insufferable about it."],
+        "draw": ["Great minds think alike.", "A draw. We're too in sync.", "Same move?? Spooky."],
+        "matchWin": "Best of three goes to you. I'll be recovering privately.",
+        "matchLose": "Match goes to me. Better luck next time, champ."
+      }
+    },
+    "friend": {
+      "label": "friend mode",
+      "recipientName": "you",
+      "welcome": {
+        "kicker": "official check-in department",
+        "greetingsFirstVisit": ["oi. you."],
+        "greetingsReturning": ["you again? fine.", "welcome back, menace.", "ah. the regular.", "back for more? bold."],
+        "intro": "This is an official, legally binding* check-in. Answer honestly or I'll assume you're being dramatic. (*not legally binding)",
+        "startLabel": "file my report",
+        "tomorrowLinkLabel": "skip to the tomorrow bit",
+        "noteText": "property of the check-in department. do not lick.",
+        "polaroidCaption": "suspect, last seen being iconic"
+      },
+      "checkin": {
+        "heading": "Status report, please.",
+        "subheading": "choose carefully. this will go on your permanent record.",
+        "changeLabel": "amend my statement",
+        "moods": [
+          {
+            "id": "thriving",
+            "icon": "sun",
+            "label": "Thriving.",
+            "description": "Annoyingly well, actually.",
+            "responses": [
+              "Disgusting. Share your secrets or leave.",
+              "Thriving? In this economy? Suspicious, but congrats.",
+              "Okay, main character. Don't let it go to your head."
+            ]
+          },
+          {
+            "id": "mid",
+            "icon": "cloud",
+            "label": "Mid.",
+            "description": "Neither good nor bad. Just… there.",
+            "responses": [
+              "Mid is a valid lifestyle. Very beige of you.",
+              "A solid 5/10 day. Could've been worse, could've been Monday.",
+              "Mid days build character. You must have so much character by now."
+            ]
+          },
+          {
+            "id": "low",
+            "icon": "battery",
+            "label": "Low battery.",
+            "description": "Need a charger and a nap.",
+            "responses": [
+              "Go lie down. That's not advice, it's an order.",
+              "Battery low? Have you tried turning yourself off and on again? (Sleep.)",
+              "Running on 2% and vibes. Respect, but please recharge."
+            ]
+          },
+          {
+            "id": "unhinged",
+            "icon": "storm",
+            "label": "Unhinged.",
+            "description": "Do not perceive me right now.",
+            "responses": [
+              "Understood. Perceiving has been paused. Text me when you're re-hinged.",
+              "Unhinged is just creative with extra steps.",
+              "Noted. I'll alert the authorities (me). I'm on my way with snacks."
+            ]
+          }
+        ]
+      },
+      "tomorrow": {
+        "heading": "Ready for tomorrow or nah?",
+        "note": "answers are non-binding and will be mocked lovingly regardless.",
+        "options": [
+          { "id": "born", "label": "Born ready.", "celebrate": true, "responses": ["Big talk. We'll see.", "Love the confidence. Terrified for tomorrow, honestly."] },
+          { "id": "define", "label": "Define 'ready'.", "celebrate": false, "responses": ["'Ready': a mythical state. Nobody has seen it.", "If you have to ask, the answer is no. Same though."] },
+          { "id": "wing", "label": "I'll wing it.", "celebrate": false, "responses": ["Classic. Winging it has a 100% success rate, as far as I know.", "The flight plan is vibes. Bold strategy."] },
+          { "id": "cancel", "label": "Tomorrow is cancelled.", "celebrate": false, "responses": ["I've emailed tomorrow. It replied 'lol no'.", "Request denied. Tomorrow is coming whether you like it or not."] }
+        ],
+        "closingTitle": "end of report",
+        "closingMessage": "That's the check-in done. You have been officially checked in on. Please rate your experience five stars.",
+        "signoff": "— management (Austine)"
+      },
+      "extras": {
+        "heading": "The Department of Friendly Roasting",
+        "intro": "all roasts are gentle, organic, and served with love.",
+        "buckets": [
+          {
+            "id": "roast",
+            "button": "roast me (gently)",
+            "lines": [
+              "You have the confidence of someone who's never checked the weather before going outside.",
+              "You reply to texts like they're a limited-edition release.",
+              "Your 'five more minutes' has never once been five minutes.",
+              "You're the reason group plans need a backup plan. Love you though."
+            ]
+          },
+          {
+            "id": "notice",
+            "button": "official notice",
+            "lines": [
+              "NOTICE: You have been found guilty of being a decent friend. Sentence: continued friendship.",
+              "MEMO: Your vibes have been reviewed and approved. Please continue.",
+              "ALERT: Hydration levels unknown. Please drink water and report back."
+            ]
+          },
+          {
+            "id": "joke",
+            "button": "inside joke",
+            "lines": ["(edit me) add your inside joke here", "(edit me) never forget the incident"]
+          },
+          {
+            "id": "reaction",
+            "button": "random reaction",
+            "lines": ["*slow clap*", "I'm telling everyone.", "Absolutely not. Anyway.", "The audacity. I love it.", "Noted, filed, and ignored."]
+          }
+        ]
+      },
+      "rps": {
+        "heading": "settle it: rock, paper, scissors",
+        "intro": "loser has to admit the winner is right about everything. forever.",
+        "win": ["Fine. You win. Enjoy it, it won't last.", "Rigged. I'm calling my lawyer.", "Okay, okay. One point. Don't get cocky."],
+        "lose": ["Too easy.", "Was that your best? Be honest.", "Another one for the trophy cabinet."],
+        "draw": ["Stop copying me.", "Draw. Boring. Again.", "Great minds, or just predictable ones?"],
+        "matchWin": "You win the match. I'll be writing a strongly worded letter.",
+        "matchLose": "Match to me. Please collect your participation award."
+      }
+    }
+  },
+  "eggs": {
+    "titleClicks": 5,
+    "titleSecret": "okay, you found the secret. here it is: you're one of my favourite people. don't make it weird.",
+    "stickerLines": ["boop!", "hey, that tickles", "i'm just a sticker, leave me alone", "ok, one more boop allowed", "you're very persistent."],
+    "polaroidBack": "Psst. If you're reading this, you're curious. That's one of my favourite things about you.",
+    "compliments": [
+      "you're doing better than you think.",
+      "honestly? great choice of website.",
+      "your energy is a gift. even the chaotic energy.",
+      "whoever's reading this: yes, you're the cool one."
+    ],
+    "startSurprises": ["oh, we're doing this? okay!", "eager. i like it.", "wheee, off we go"],
+    "repeatPick": "you've picked that {count} times. i believe you, i promise.",
+    "footer": "made by Austine, just for you. no cookies, no tracking, just vibes."
+  }
+}
