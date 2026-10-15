@@ -6,8 +6,8 @@ import { writeFileSync, mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-const server = await preview({ preview: { port: 4321, strictPort: true }, logLevel: 'silent' })
-const BASE = 'http://localhost:4321/'
+const server = process.env.BASE_URL ? null : await preview({ preview: { port: 4321, strictPort: true }, logLevel: 'silent' })
+const BASE = process.env.BASE_URL || 'http://localhost:4321/'
 const browser = await chromium.launch()
 let failures = 0
 const ok = (cond, msg) => {
@@ -34,9 +34,9 @@ try {
   // keyboard: tab to the start button and press Enter
   for (let i = 0; i < 8; i++) {
     await page.keyboard.press('Tab')
-    if ((await page.evaluate(() => document.activeElement?.textContent)).includes('start the check-in')) break
+    if (await page.evaluate(() => document.activeElement?.classList.contains('btn-big'))) break
   }
-  ok((await page.evaluate(() => document.activeElement?.textContent)).includes('start the check-in'), 'start button reachable by keyboard')
+  ok(await page.evaluate(() => document.activeElement?.classList.contains('btn-big')), 'start button reachable by keyboard')
   await page.keyboard.press('Enter')
   await page.waitForTimeout(600)
   ok(await page.evaluate(() => document.activeElement?.classList.contains('mood-card')), 'start moves focus to the first mood')
@@ -210,7 +210,7 @@ try {
   failures++
 } finally {
   await browser.close()
-  await new Promise((r) => server.httpServer.close(r))
+  if (server) await new Promise((r) => server.httpServer.close(r))
 }
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed')
 process.exit(failures ? 1 : 0)

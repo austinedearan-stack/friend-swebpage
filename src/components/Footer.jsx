@@ -13,6 +13,10 @@ export default function Footer({ eggs, vars, pick }) {
       <p className="footer-note">
         <Heart size={16} /> {fill(eggs.footer, vars)}
       </p>
+      {/* lets you check a phone has the newest version (set at build time) */}
+      <p className="build-stamp">
+        updated {new Date(__BUILD_TIME__).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+      </p>
     </footer>
   )
 }

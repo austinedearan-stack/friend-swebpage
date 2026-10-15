@@ -15,6 +15,21 @@ import AdminGate from './components/AdminGate.jsx'
 import { Toasts, Confetti } from './components/Feedback.jsx'
 
 const PUBLISHED = sanitizeConfig(DEFAULT_CONFIG)
+// Fingerprint of the published words. An admin draft remembers which version it
+// was based on; once a new site-config.json is published, old drafts are dropped
+// so they can't hide the new text in the admin's browser.
+const PUBLISHED_ID = (() => {
+  let h = 5381
+  for (const ch of JSON.stringify(PUBLISHED)) h = ((h * 33) ^ ch.charCodeAt(0)) >>> 0
+  return h.toString(36)
+})()
+const saveDraft = (data) => store.set(KEYS.draft, { base: PUBLISHED_ID, data })
+const STALE_DRAFT_CLEARED = (() => {
+  const d = store.get(KEYS.draft)
+  if (!d || d.base === PUBLISHED_ID) return false
+  store.remove(KEYS.draft)
+  return true
+})()
 // counted once per page load (module scope, so re-renders can't double count)
 const VISIT = (() => {
   const n = (Number(store.get(KEYS.visits, 0)) || 0) + 1
@@ -43,7 +58,7 @@ export default function App() {
   // raw draft = what the admin typed (may contain empty fields while editing); sanitized before use
   const [draftRaw, setDraftRaw] = useState(() => {
     const d = store.get(KEYS.draft)
-    return d ? sanitizeConfig(d) : null
+    return d?.data ? sanitizeConfig(d.data) : null
   })
   useEffect(() => {
     const onHash = () => /^#admin\b/.test(window.location.hash) && setGateOpen(true)
@@ -58,7 +73,7 @@ export default function App() {
     setDraftRaw((prev) => {
       const next = structuredClone(prev || PUBLISHED)
       mutate(next)
-      store.set(KEYS.draft, next)
+      saveDraft(next)
       return next
     })
   }, [])
@@ -130,6 +145,10 @@ export default function App() {
     const id = Math.random().toString(36).slice(2)
     setToasts((t) => [...t.slice(-2), { id, text, tone }])
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3800)
+  }, [])
+  useEffect(() => {
+    if (STALE_DRAFT_CLEARED && isAdmin) toast('a new version was published, so your old unpublished draft was cleared.')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [bursts, setBursts] = useState([])
   const celebrate = useCallback((x, y) => {
@@ -292,7 +311,7 @@ export default function App() {
         updateDraft={updateDraft}
         discardDraft={discardDraft}
         published={PUBLISHED}
-        setDraftRaw={(d) => { store.set(KEYS.draft, d); setDraftRaw(d) }}
+        setDraftRaw={(d) => { saveDraft(d); setDraftRaw(d) }}
       />
 
       {gateOpen && !isAdmin && <AdminGate onUnlock={unlock} onClose={() => { setGateOpen(false); clearUrlHash() }} />}

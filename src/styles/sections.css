@@ -302,3 +302,4 @@
   :root[data-studio='open'] #main, :root[data-studio='open'] .site-header, :root[data-studio='open'] .site-footer, :root[data-studio='open'] .admin-bar { margin-right: 410px; }
   #main, .site-header, .site-footer { transition: margin-right var(--dur) ease; }
 }
+.build-stamp { margin-top: .4rem; font-size: .72rem; color: var(--text-muted); opacity: .8; }
