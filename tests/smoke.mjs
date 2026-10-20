@@ -1,14 +1,19 @@
-// End-to-end smoke test. Serves the built site and clicks through everything.
-// Usage: npm run build && npm test
-//   (npm test also makes a second build wired to a fake Supabase, see tests/live.mjs)
-import { preview } from 'vite'
+// End-to-end smoke test. Builds a copy of the site with the live backend switched
+// off (so it never touches the real Supabase project), serves it, clicks through everything.
+// Usage: npm test   (tests/live.mjs then covers the live backend against a fake Supabase)
+import { build, preview } from 'vite'
 import { chromium } from 'playwright'
 import { writeFileSync, mkdtempSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const CONFIG = JSON.parse(readFileSync('src/config/site-config.json', 'utf8'))
-const server = process.env.BASE_URL ? null : await preview({ preview: { port: 4321, strictPort: true }, logLevel: 'silent' })
+if (!process.env.BASE_URL) {
+  process.env.VITE_BACKEND = 'off'
+  await build({ logLevel: 'silent', build: { outDir: 'dist-test', emptyOutDir: true } })
+  delete process.env.VITE_BACKEND
+}
+const server = process.env.BASE_URL ? null : await preview({ build: { outDir: 'dist-test' }, preview: { port: 4321, strictPort: true }, logLevel: 'silent' })
 const BASE = process.env.BASE_URL || 'http://localhost:4321/'
 const browser = await chromium.launch()
 let failures = 0
@@ -26,7 +31,16 @@ const newPage = async (opts = {}, init) => {
   return page
 }
 const cssVar = (page, v) => page.evaluate((n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), v)
-const noOverflow = (page) => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)
+// measured once one-off animations (step slide-ins, the portal) have finished
+const noOverflow = (page) =>
+  page.evaluate(async () => {
+    await Promise.all(document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {})))
+    return document.documentElement.scrollWidth <= innerWidth
+  })
+const nextStep = async (page, heading) => {
+  await page.click('.flow-next')
+  await page.waitForSelector(heading, { state: 'visible', timeout: 5000 }).catch(() => {})
+}
 const visible = '.flow-step:not([hidden])'
 const settle = (page) => page.waitForTimeout(1100) // portal page transition
 
@@ -75,7 +89,7 @@ try {
   ok((await page.$$('.mood-card[aria-checked="true"]')).length === 0, 'change answer clears selection')
   await page.click('.mood-card:nth-child(1)')
 
-  await page.click('.flow-next')
+  await nextStep(page, '#tomorrow-h')
   ok((await page.evaluate(() => location.hash)) === '#/checkin/tomorrow' && (await page.isVisible('#tomorrow-h')), 'next button → tomorrow step')
   for (let i = 1; i <= 4; i++) {
     await page.click(`.choice:nth-child(${i})`)
@@ -83,13 +97,13 @@ try {
   }
   ok((await page.textContent('.closing')).includes('Austine'), 'closing message appears')
 
-  await page.click('.flow-next')
+  await nextStep(page, '#extras-h')
   for (const b of await page.$$('.btn-sticker')) {
     await b.click()
     ok((await page.textContent('.extras-line')).length > 5, `extras button “${(await b.textContent()).trim()}” works`)
   }
 
-  await page.click('.flow-next')
+  await nextStep(page, '#rps-h')
   ok(await page.isVisible('#rps-h'), 'next button → game step')
   const beats = { '✊': '✌️', '✋': '✊', '✌️': '✋' }
   let mismatches = 0

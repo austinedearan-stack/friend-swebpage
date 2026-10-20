@@ -89,7 +89,7 @@ try {
   await p1.waitForSelector('.site-title:has-text("LIVE TITLE")', { timeout: 15000 }).catch(() => {})
   ok((await p1.textContent('.site-title')).includes('LIVE TITLE'), 'visitor sees the words from the database')
   await p1.click('.nav-tab:has-text("announcements")')
-  await p1.waitForTimeout(1200)
+  await p1.waitForSelector('.ann-card:has-text("from the database")', { timeout: 10000 }).catch(() => {})
   ok(await p1.isVisible('.ann-card:has-text("from the database")'), 'visitor sees announcements from the database')
   ok(!fake.db.calls.some((c) => c.includes('/auth/')), 'visitors never load the login machinery')
   ok(p1.errors.length === 0, `no page errors (visitor) ${p1.errors.join(' | ')}`)
