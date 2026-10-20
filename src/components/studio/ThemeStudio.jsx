@@ -4,6 +4,7 @@ import { ColorField, Segmented, Select, Slider, Toggle } from './Controls.jsx'
 import SavePanel from './SavePanel.jsx'
 import ContentEditor from './ContentEditor.jsx'
 import PublishPanel from './PublishPanel.jsx'
+import AnnouncementsEditor from './AnnouncementsEditor.jsx'
 import { Heart, Star } from '../Doodles.jsx'
 
 const THEME_TABS = [
@@ -16,7 +17,8 @@ const THEME_TABS = [
   ['save', 'save & share'],
 ]
 const ADMIN_TABS = [
-  ['words', '✎ words'],
+  ['words', '✎ pages & words'],
+  ['announce', '📣 posts'],
   ['publish', '★ publish'],
 ]
 
@@ -27,8 +29,8 @@ function ago(ts, now) {
 }
 
 export default function ThemeStudio(props) {
-  const { open, onClose, theme, setTheme, undo, canUndo, creatorDefault, savedAt, previewingShared, toast, picking, setPicking, focusTarget, isAdmin } = props
-  const [tab, setTab] = useState('presets')
+  const { open, onClose, theme, setTheme, undo, canUndo, creatorDefault, savedAt, previewingShared, toast, picking, setPicking, focusTarget, isAdmin, themeEditable, request } = props
+  const [tab, setTab] = useState(themeEditable ? 'presets' : 'words')
   const [showSample, setShowSample] = useState(() => window.innerWidth >= 900)
   const [now, setNow] = useState(Date.now())
   const panel = useRef(null)
@@ -74,6 +76,11 @@ export default function ThemeStudio(props) {
     }, 60)
   }, [focusTarget])
 
+  // other parts of the page can open the studio on a given tab (e.g. "edit" on an announcement)
+  useEffect(() => {
+    if (request?.tab) setTab(request.tab)
+  }, [request])
+
   const set = (group, key) => (value, coalesce = false) =>
     setTheme((t) => ({ ...t, [group]: { ...t[group], [key]: value } }), { coalesce })
 
@@ -85,7 +92,8 @@ export default function ThemeStudio(props) {
     ['button text', c.buttonText, c.buttonBg],
   ].map(([label, fg, bg]) => ({ label, ratio: contrast(fg, bg) }))
 
-  const tabs = isAdmin ? [...THEME_TABS, ...ADMIN_TABS] : THEME_TABS
+  const tabs = [...(themeEditable ? THEME_TABS : []), ...(isAdmin ? ADMIN_TABS : [])]
+  const active = tabs.some(([id]) => id === tab) ? tab : tabs[0]?.[0]
 
   return (
     <aside
@@ -99,8 +107,9 @@ export default function ThemeStudio(props) {
     >
       <div className="studio-head">
         <span className="tape tape-top" aria-hidden="true" />
-        <h2 id="studio-h" className="studio-title hand" tabIndex={-1}>make it yours</h2>
+        <h2 id="studio-h" className="studio-title hand" tabIndex={-1}>{themeEditable ? 'make it yours' : 'admin'}</h2>
         <div className="studio-head-actions">
+          {themeEditable && (<>
           <button className="icon-btn" onClick={undo} disabled={!canUndo} aria-label="undo last change" title="undo">↶</button>
           <button
             className={`icon-btn ${picking ? 'on' : ''}`}
@@ -111,12 +120,13 @@ export default function ThemeStudio(props) {
           >
             ⌖
           </button>
+          </>)}
           <button className="icon-btn" onClick={onClose} aria-label="close the studio">✕</button>
         </div>
       </div>
       {picking && <p className="pick-hint" role="status">tap any card, button or heading on the page to jump to its setting. (esc to cancel)</p>}
 
-      <div className="sample-wrap">
+      {themeEditable && <div className="sample-wrap">
         <button className="link-btn sample-toggle" onClick={() => setShowSample((s) => !s)} aria-expanded={showSample}>
           {showSample ? 'hide' : 'show'} live sample
         </button>
@@ -134,18 +144,18 @@ export default function ThemeStudio(props) {
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
       <div className="studio-tabs" role="tablist" aria-label="studio sections">
         {tabs.map(([id, label]) => (
-          <button key={id} role="tab" id={`tab-${id}`} aria-selected={tab === id} aria-controls="studio-panel" className={`tab ${id === 'words' || id === 'publish' ? 'tab-admin' : ''}`} onClick={() => setTab(id)}>
+          <button key={id} role="tab" id={`tab-${id}`} aria-selected={active === id} aria-controls="studio-panel" className={`tab ${ADMIN_TABS.some(([a]) => a === id) ? 'tab-admin' : ''}`} onClick={() => setTab(id)}>
             {label}
           </button>
         ))}
       </div>
 
-      <div className="studio-body" id="studio-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
-        {tab === 'presets' && (
+      <div className="studio-body" id="studio-panel" role="tabpanel" aria-labelledby={`tab-${active}`}>
+        {active === 'presets' && (
           <div className="preset-grid">
             {PRESET_IDS.map((id) => {
               const p = PRESETS[id]
@@ -173,7 +183,7 @@ export default function ThemeStudio(props) {
           </div>
         )}
 
-        {tab === 'colors' && (
+        {active === 'colors' && (
           <div className="ctl-stack">
             {COLOR_FIELDS.map(([k, label]) => (
               <ColorField key={k} id={`ctl-colors-${k}`} label={label} value={c[k]} onChange={(v, co) => set('colors', k)(v, co)} />
@@ -190,7 +200,7 @@ export default function ThemeStudio(props) {
           </div>
         )}
 
-        {tab === 'type' && (
+        {active === 'type' && (
           <div className="ctl-stack">
             <div className="ctl">
               <span className="ctl-label">font pairings</span>
@@ -231,7 +241,7 @@ export default function ThemeStudio(props) {
           </div>
         )}
 
-        {tab === 'layout' && (
+        {active === 'layout' && (
           <div className="ctl-stack">
             <Segmented id="ctl-layout-density" label="density" value={theme.layout.density} options={[['compact', 'compact'], ['cozy', 'cozy'], ['spacious', 'spacious']]} onChange={set('layout', 'density')} />
             <Slider id="ctl-layout-radius" label="corner roundness" value={theme.layout.radius} {...rng('radius')} format={(v) => `${v}px`} onChange={set('layout', 'radius')} />
@@ -244,7 +254,7 @@ export default function ThemeStudio(props) {
           </div>
         )}
 
-        {tab === 'deco' && (
+        {active === 'deco' && (
           <div className="ctl-stack">
             <Segmented
               id="ctl-deco-pattern"
@@ -262,7 +272,7 @@ export default function ThemeStudio(props) {
           </div>
         )}
 
-        {tab === 'motion' && (
+        {active === 'motion' && (
           <div className="ctl-stack">
             <Segmented
               id="ctl-motion-level"
@@ -278,18 +288,21 @@ export default function ThemeStudio(props) {
           </div>
         )}
 
-        {tab === 'save' && <SavePanel theme={theme} setTheme={setTheme} toast={toast} />}
-        {tab === 'words' && isAdmin && <ContentEditor {...props} />}
-        {tab === 'publish' && isAdmin && <PublishPanel {...props} />}
+        {active === 'save' && <SavePanel theme={theme} setTheme={setTheme} toast={toast} page={props.page} />}
+        {active === 'words' && isAdmin && <ContentEditor {...props} />}
+        {active === 'announce' && isAdmin && <AnnouncementsEditor {...props} />}
+        {active === 'publish' && isAdmin && <PublishPanel {...props} />}
       </div>
 
       <div className="studio-foot">
-        <p className="save-status" role="status">
+        {themeEditable && <p className="save-status" role="status">
           {previewingShared ? '👀 previewing a shared theme (not saved yet)' : savedAt ? `✓ saved in this browser ${ago(savedAt, now)}` : 'changes save in this browser automatically'}
-        </p>
+        </p>}
         <div className="studio-foot-actions">
+          {themeEditable && (<>
           <button className="btn btn-ghost btn-small" onClick={() => { setTheme(openedWith.current); toast('reverted to how it was when you opened this') }}>revert</button>
           <button className="btn btn-ghost btn-small" onClick={() => { setTheme(creatorDefault); toast('back to the default look') }}>reset to default</button>
+          </>)}
           <button className="btn btn-primary btn-small" onClick={onClose}>done</button>
         </div>
       </div>

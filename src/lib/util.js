@@ -1,13 +1,16 @@
 // Small helpers: safe storage, randomness, share-link encoding, file download.
 import { sanitizeTheme, themeDiff, themeFrom, PRESET_IDS } from '../config/themes.js'
+import { parseHash, routeHash } from './router.js'
 
 export const KEYS = {
-  theme: 'aci.theme.v1', // this browser's chosen theme
+  theme: 'aci.theme.v1', // this browser's chosen theme (+ '.<page>' per page; the bare key is the old single-page one)
   saved: 'aci.savedThemes.v1', // named themes saved in this browser
   draft: 'aci.adminDraft.v1', // creator's unpublished content draft (admin only)
   admin: 'aci.admin.v1', // admin unlock token
   visits: 'aci.visits.v1',
   previewAsVisitor: 'aci.previewVisitor.v1',
+  liveCache: 'aci.liveContent.v1', // last words fetched from the live backend (instant next load)
+  annCache: 'aci.announcements.v1', // last announcements fetched from the live backend
 }
 
 export const store = {
@@ -74,11 +77,11 @@ function b64urlDecode(s) {
   return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)))
 }
 
-export function encodeThemeForUrl(theme) {
+export function encodeThemeForUrl(theme, page) {
   const payload = b64urlEncode(JSON.stringify({ p: theme.preset, d: themeDiff(theme) }))
   if (payload.length > MAX_URL_PAYLOAD) return { ok: false, reason: 'too-long', length: payload.length }
   const url = new URL(window.location.href)
-  url.hash = `theme=${payload}`
+  url.hash = page ? `/${page}&theme=${payload}` : `theme=${payload}`
   url.search = ''
   return { ok: true, url: url.toString(), length: payload.length }
 }
@@ -97,8 +100,10 @@ export function readThemeFromUrl() {
   }
 }
 
+/** Drops one-off bits of the hash (#admin, #theme=…, login tokens) but keeps the page route. */
 export function clearUrlHash() {
-  history.replaceState(null, '', window.location.pathname + window.location.search)
+  const { page, step } = parseHash()
+  history.replaceState(null, '', window.location.pathname + window.location.search + (page ? routeHash(page, step) : ''))
 }
 
 export function downloadJson(filename, data) {

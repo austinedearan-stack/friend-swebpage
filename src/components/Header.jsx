@@ -1,7 +1,11 @@
 import { useRef, useState } from 'react'
 import { Heart } from './Doodles.jsx'
+import { FriendsIcon, HeartIcon, MegaphoneIcon } from './RickMorty.jsx'
+import { routeHash } from '../lib/router.js'
 
-export default function Header({ title, eggs, celebrate, onOpenStudio, modeLabel, canSwitch, mode, modes, onSwitchMode }) {
+const ICONS = { checkin: HeartIcon, friends: FriendsIcon, announcements: MegaphoneIcon }
+
+export default function Header({ title, eggs, celebrate, onOpenStudio, studioLabel, navItems, page }) {
   const [clicks, setClicks] = useState(0)
   const [secret, setSecret] = useState(false)
   const [wiggle, setWiggle] = useState(0)
@@ -34,23 +38,31 @@ export default function Header({ title, eggs, celebrate, onOpenStudio, modeLabel
           <span>{title}</span>
         </button>
 
-        <div className="header-actions">
-          {canSwitch ? (
-            <div className="mode-switch" role="group" aria-label="choose a mode">
-              {Object.entries(modes).map(([id, m]) => (
-                <button key={id} className="chip" aria-pressed={mode === id} onClick={() => onSwitchMode(id)}>
-                  {mode === id && <span aria-hidden="true">✓ </span>}
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <span className="mode-badge" title="current mode">{modeLabel}</span>
-          )}
+        {navItems.length > 1 && (
+          <nav className="site-nav" aria-label="pages">
+            <ul>
+              {navItems.map((it) => {
+                const Icon = ICONS[it.id]
+                const on = it.id === page
+                return (
+                  <li key={it.id}>
+                    <a href={routeHash(it.id)} className={`nav-tab ${on ? 'is-active' : ''}`} aria-current={on ? 'page' : undefined}>
+                      <Icon />
+                      <span className="nav-label">{it.label}</span>
+                      {it.flag && <span className="nav-flag" title={`admin only: ${it.flag}`}>{it.flag}</span>}
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+        )}
+
+        {studioLabel && (
           <button className="btn btn-studio" onClick={onOpenStudio} aria-haspopup="dialog">
-            <span aria-hidden="true">🎨</span> make it yours
+            <span aria-hidden="true">{studioLabel === 'admin' ? '⚙' : '🎨'}</span> <span className="studio-label">{studioLabel}</span>
           </button>
-        </div>
+        )}
       </div>
 
       {secret && (

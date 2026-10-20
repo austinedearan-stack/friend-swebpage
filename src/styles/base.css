@@ -12,6 +12,7 @@
   --dur: .32s; --bounce: cubic-bezier(.34, 1.56, .64, 1);
   color-scheme: light;
 }
+:root[data-page='announcements'] { color-scheme: dark; }
 :root[data-motion='subtle'] { --dur: .2s; --bounce: ease-out; }
 :root[data-motion='reduced'] { --dur: .01ms; --bounce: linear; }
 
@@ -157,7 +158,7 @@ button.chip[aria-pressed='true'] { border-color: var(--text); background: var(--
 .toggle input:checked + .toggle-ui::after { transform: translateX(18px); }
 .toggle input:focus-visible + .toggle-ui { outline: 3px solid var(--text); outline-offset: 3px; }
 
-input:not([type]), input[type='text'], input[type='password'], input[type='number'], select, textarea {
+input:not([type]), input[type='text'], input[type='password'], input[type='email'], input[type='number'], input[type='datetime-local'], select, textarea {
   width: 100%; min-height: 42px; padding: .45em .7em;
   background: var(--surface); color: var(--text);
   border: 1.5px solid var(--border-color); border-radius: 10px;

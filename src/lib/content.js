@@ -1,11 +1,14 @@
 // Content (copy) validation. The bundled site-config.json is the template:
-// any imported/draft content is walked against it, keeping only values of the
-// same shape, capping lengths, and falling back to the defaults otherwise.
+// any imported/draft/live content is walked against it, keeping only values of
+// the same shape, capping lengths, and falling back to the defaults otherwise.
 import SITE from '../config/site-config.json'
+import { sanitizeAnnouncements } from './announcements.js'
 
 export const DEFAULT_CONFIG = SITE
 export const ICONS = ['sun', 'cloud', 'battery', 'storm', 'heart', 'star', 'flower', 'coffee', 'moon', 'sparkle']
-export const MODES = ['personal', 'friend']
+export const PAGE_IDS = ['checkin', 'friends', 'announcements']
+// the two check-in style pages keep their words under "modes"
+export const PAGE_MODE = { checkin: 'personal', friends: 'friend' }
 
 const MAX_STR = 600
 const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v)
@@ -22,7 +25,7 @@ function walk(input, template, key) {
   if (typeof template === 'string') {
     if (key === 'icon') return ICONS.includes(input) ? input : template
     if (key === 'id') return typeof input === 'string' && /^[a-z0-9-]{1,24}$/.test(input) ? input : template
-    if (key === 'activeMode') return MODES.includes(input) ? input : template
+    if (key === 'homePage') return PAGE_IDS.includes(input) ? input : template
     if (key === 'passphraseHash') return typeof input === 'string' && /^[0-9a-f]{64}$/.test(input) ? input : template
     return cleanStr(input, template)
   }
@@ -53,8 +56,10 @@ function walk(input, template, key) {
     const src = isObj(input) ? input : {}
     const out = {}
     for (const k of Object.keys(template)) {
-      if (k === 'defaultTheme') out[k] = isObj(src[k]) ? src[k] : template[k] // themes are validated in themes.js
+      if (k === 'theme') out[k] = isObj(src[k]) ? src[k] : template[k] // themes are validated in themes.js
       else if (k === 'overrides') out[k] = isObj(src[k]) ? src[k] : {}
+      // the top-level list of posts (pages.announcements is page settings, walked normally)
+      else if (k === 'announcements' && Array.isArray(template[k])) out[k] = sanitizeAnnouncements(Array.isArray(src[k]) ? src[k] : template[k])
       else out[k] = walk(src[k], template[k], k)
     }
     return out
@@ -64,6 +69,13 @@ function walk(input, template, key) {
 
 export function sanitizeConfig(input) {
   return walk(input, DEFAULT_CONFIG, null)
+}
+
+/** Short stable fingerprint of a config, so drafts know which version they were based on. */
+export function fingerprint(cfg) {
+  let h = 5381
+  for (const ch of JSON.stringify(cfg)) h = ((h * 33) ^ ch.charCodeAt(0)) >>> 0
+  return h.toString(36)
 }
 
 /** Replace {name}/{count} tokens. Output is rendered as text, never HTML. */

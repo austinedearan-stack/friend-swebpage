@@ -16,6 +16,9 @@ import '@fontsource/fraunces/latin-600.css'
 import './styles/base.css'
 import './styles/sections.css'
 import './styles/studio.css'
+import './styles/pages.css'
+import './styles/rm.css'
+import './styles/announcements.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(<App />)

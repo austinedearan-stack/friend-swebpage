@@ -1,43 +1,77 @@
 import { useState } from 'react'
-import { ICONS } from '../../lib/content.js'
+import { ICONS, PAGE_IDS } from '../../lib/content.js'
+import { routeHash } from '../../lib/router.js'
 import { LinesField, Segmented, TextField, Toggle } from './Controls.jsx'
 
-// Admin-only editor for every piece of copy. Writes into the local draft;
+const PAGE_NAMES = { checkin: 'check-in page', friends: 'friends page', announcements: 'announcements page' }
+
+// Admin-only editor for pages + every piece of copy. Writes into the local draft;
 // the live site only changes after publishing (see PublishPanel).
-export default function ContentEditor({ config, draftRaw, published, updateDraft }) {
+export default function ContentEditor({ draftRaw, published, updateDraft, page, toast }) {
   const raw = draftRaw || published
-  const [editMode, setEditMode] = useState(config.site.activeMode)
+  const [editMode, setEditMode] = useState(page === 'friends' ? 'friend' : 'personal')
   const m = raw.modes[editMode]
   const up = (fn) => updateDraft((d) => fn(d.modes[editMode], d))
 
   return (
     <div className="ctl-stack content-editor">
-      <p className="ctl-hint">changes show up on the page right away, but only in <b>your</b> browser. use the publish tab to make them live. tip: <code>{'{name}'}</code> becomes the recipient's name.</p>
+      <p className="ctl-hint">changes show up on the page right away, but only for <b>you</b> until you press publish. tip: <code>{'{name}'}</code> becomes the recipient's name.</p>
 
-      <Section title="site & mode" open>
+      <Section title="pages & menu" open>
         <TextField label="website title" value={raw.site.title} onChange={(v) => updateDraft((d) => { d.site.title = v })} />
         <Segmented
-          id="ed-mode"
-          label="which mode is live"
-          value={raw.site.activeMode}
-          options={[['personal', raw.modes.personal.label || 'personal'], ['friend', raw.modes.friend.label || 'friend']]}
-          onChange={(v) => updateDraft((d) => { d.site.activeMode = v })}
+          id="ed-home"
+          label="opening the plain link (no #/…) shows"
+          value={raw.site.homePage}
+          options={PAGE_IDS.map((id) => [id, raw.pages[id].navLabel])}
+          onChange={(v) => updateDraft((d) => { d.site.homePage = v })}
         />
-        <Toggle
-          id="ed-visitor-switch"
-          label="let visitors switch modes themselves"
-          checked={raw.site.visitorCanSwitchMode}
-          onChange={(v) => updateDraft((d) => { d.site.visitorCanSwitchMode = v })}
-          hint="off = they only ever see the live mode above. links can never change this."
-        />
+        {PAGE_IDS.map((id) => {
+          const pg = raw.pages[id]
+          const link = window.location.origin + window.location.pathname + routeHash(id)
+          return (
+            <fieldset key={id} className="item-box">
+              <legend>{PAGE_NAMES[id]}</legend>
+              <Toggle id={`ed-on-${id}`} label="page is on" checked={pg.enabled} onChange={(v) => updateDraft((d) => { d.pages[id].enabled = v })} hint={pg.enabled ? null : 'visitors are sent to the home page instead. you still see it.'} />
+              <Toggle
+                id={`ed-nav-${id}`}
+                label="show it in the menu"
+                checked={pg.inNav}
+                onChange={(v) => updateDraft((d) => { d.pages[id].inNav = v })}
+                hint={pg.inNav ? null : 'private-ish: only people with the link below can find it.'}
+              />
+              <TextField label="menu label" value={pg.navLabel} maxLength={30} onChange={(v) => updateDraft((d) => { d.pages[id].navLabel = v })} />
+              <div className="inline-row">
+                <input className="link-box" readOnly value={link} aria-label={`link to the ${PAGE_NAMES[id]}`} onFocus={(e) => e.target.select()} />
+                <button
+                  className="btn btn-small btn-ghost"
+                  onClick={async () => {
+                    try { await navigator.clipboard.writeText(link); toast('link copied ✓', 'good') } catch { toast("couldn't copy. select the link and copy it.", 'bad') }
+                  }}
+                >
+                  copy
+                </button>
+              </div>
+            </fieldset>
+          )
+        })}
+        <p className="ctl-hint">heads up: hidden pages are hidden, not secret. anyone determined could still find the words.</p>
+      </Section>
+
+      <Section title="announcements page (top text)">
+        <TextField label="small line above the heading" value={raw.pages.announcements.kicker} onChange={(v) => updateDraft((d) => { d.pages.announcements.kicker = v })} />
+        <TextField label="heading" value={raw.pages.announcements.heading} onChange={(v) => updateDraft((d) => { d.pages.announcements.heading = v })} />
+        <TextField label="intro" multiline value={raw.pages.announcements.intro} onChange={(v) => updateDraft((d) => { d.pages.announcements.intro = v })} />
+        <TextField label="when there's nothing to show" value={raw.pages.announcements.emptyText} onChange={(v) => updateDraft((d) => { d.pages.announcements.emptyText = v })} />
+        <TextField label="under the last post" value={raw.pages.announcements.caughtUp} onChange={(v) => updateDraft((d) => { d.pages.announcements.caughtUp = v })} />
+        <p className="ctl-hint">the posts themselves live in the 📣 announcements tab.</p>
       </Section>
 
       <div className="edit-mode-pick">
-        <Segmented id="ed-editing" label="editing the words for" value={editMode} options={[['personal', 'personal mode'], ['friend', 'friend mode']]} onChange={setEditMode} />
+        <Segmented id="ed-editing" label="editing the words for" value={editMode} options={[['personal', 'check-in page'], ['friend', 'friends page']]} onChange={setEditMode} />
       </div>
 
       <Section title="welcome">
-        <TextField label="mode name (shown in the header)" value={m.label} onChange={(v) => up((x) => { x.label = v })} />
         <TextField label="recipient's name" value={m.recipientName} onChange={(v) => up((x) => { x.recipientName = v })} />
         <TextField label="small line above the greeting" value={m.welcome.kicker} onChange={(v) => up((x) => { x.welcome.kicker = v })} />
         <LinesField label="greeting on first visit" value={m.welcome.greetingsFirstVisit} onChange={(v) => up((x) => { x.welcome.greetingsFirstVisit = v })} rows={2} />
@@ -132,7 +166,7 @@ export default function ContentEditor({ config, draftRaw, published, updateDraft
         <TextField label="best-of-three: they lose" value={m.rps.matchLose} onChange={(v) => up((x) => { x.rps.matchLose = v })} />
       </Section>
 
-      <Section title="easter eggs (shared by both modes)">
+      <Section title="easter eggs (shared by every page)">
         <TextField label="secret message (click the title…)" multiline value={raw.eggs.titleSecret} onChange={(v) => updateDraft((d) => { d.eggs.titleSecret = v })} />
         <div className="ctl">
           <label className="ctl-label" htmlFor="ed-clicks">…this many times</label>
@@ -141,6 +175,8 @@ export default function ContentEditor({ config, draftRaw, published, updateDraft
         <TextField label="hidden note on the back of the polaroid" multiline value={raw.eggs.polaroidBack} onChange={(v) => updateDraft((d) => { d.eggs.polaroidBack = v })} />
         <LinesField label="heart sticker says…" value={raw.eggs.stickerLines} onChange={(v) => updateDraft((d) => { d.eggs.stickerLines = v })} />
         <LinesField label="random compliments (footer)" value={raw.eggs.compliments} onChange={(v) => updateDraft((d) => { d.eggs.compliments = v })} />
+        <LinesField label="blue helper says… (after a mood is picked)" value={raw.eggs.helperLines} onChange={(v) => updateDraft((d) => { d.eggs.helperLines = v })} rows={3} />
+        <LinesField label="the hidden pickle says…" value={raw.eggs.pickleLines} onChange={(v) => updateDraft((d) => { d.eggs.pickleLines = v })} rows={3} />
         <LinesField label="start button sometimes says…" value={raw.eggs.startSurprises} onChange={(v) => updateDraft((d) => { d.eggs.startSurprises = v })} rows={3} />
         <TextField label="when the same mood is picked 3+ times ({count} = how many)" value={raw.eggs.repeatPick} onChange={(v) => updateDraft((d) => { d.eggs.repeatPick = v })} />
         <TextField label="footer" value={raw.eggs.footer} onChange={(v) => updateDraft((d) => { d.eggs.footer = v })} />

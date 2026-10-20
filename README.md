@@ -1,8 +1,16 @@
 # Austine checking in 💌
 
-A tiny, playful check-in website: greeting → mood check-in → "ready for tomorrow?" → little extras → rock-paper-scissors, plus Easter eggs and a full theme studio ("make it yours").
+A small scrapbook-style website with three pages:
 
-React + Vite, plain CSS variables, no backend, no tracking, no accounts. Fonts are bundled locally.
+| Page | Link | What it is |
+|---|---|---|
+| **Check-in** | `…/#/checkin` (also the plain link) | The personal check-in for Brenda. It's off the menu by default, so only people with the link find it. |
+| **Friends** | `…/#/friends` | The same five steps with friend wording and its own "lab notebook" look. |
+| **Announcements** | `…/#/announcements` | A dark neon notice board for news, events (with live countdowns) and fun posts. |
+
+The check-in and friends pages go one step at a time: hello → check-in → tomorrow → extras → game. Each has a progress bar and next/back buttons, and the browser back button works. Switching pages opens a portal. Original Rick & Morty-style doodles (portal, saucer, portal gun, a blue helper and a hidden pickle) are drawn as SVG in `src/components/RickMorty.jsx`. All animation switches off for visitors who ask their device for reduced motion.
+
+React + Vite, plain CSS, fonts bundled locally. There's an optional free live backend (Supabase) for posting and editing without redeploying.
 
 ## Run it locally
 
@@ -10,62 +18,76 @@ React + Vite, plain CSS variables, no backend, no tracking, no accounts. Fonts a
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # production build → dist/
-ADMIN_PASS="your passphrase" npm test   # after a build: clicks through every feature in headless Chrome
+npm test           # after a build: clicks through every page + the admin panel in headless Chrome
 ```
 
-(Tests need a one-time `npx playwright install chromium-headless-shell`.)
+(Tests need a one-time `npx playwright install chromium-headless-shell`. `npm test` also builds a second copy wired to a fake Supabase to test the live mode.)
 
-## Personalising it
+## The admin panel
 
-All words, the live mode and the default look live in **one file: `src/config/site-config.json`**. You can edit it by hand, or use the in-browser editor:
+Open the site with `#admin` on the end, e.g. `https://you.github.io/friend-swebpage/#admin`, and log in. An admin bar then appears with:
 
-1. Open the site with `#admin` on the end, e.g. `https://you.github.io/checkin/#admin`.
-2. Enter your passphrase (only its SHA-256 hash is stored in the repo). To change it, use the studio's ★ publish tab, or run `npm run hash -- "new passphrase"` and paste the result into `admin.passphraseHash`.
-3. In the studio, the **✎ words** tab edits every line of text for both modes. The admin bar at the top switches the **live mode** (personal ↔ friend).
-4. Edits preview instantly, but **only in your browser**. To make them live: ★ publish → *download site-config.json* → replace `src/config/site-config.json` in the repo (on GitHub: open the file → pencil icon → paste, or "Add file → Upload files"). The site redeploys itself in about 1 minute, and the link stays the same.
+- **pages & words:** turn each page on or off, choose whether it shows in the menu, rename the menu labels, pick which page the plain link opens, copy each page's link, and edit every line of text on the check-in and friends pages and the announcements header.
+- **announcements:** write, edit, pin, reorder, schedule (event countdown), auto-expire and delete posts. Each post has a type (important / event / fun / info), an optional cover photo and an optional link. "Edit" buttons also appear on the cards themselves.
+- **publish:** make your changes live (see below), set the current look as a page's default, download a backup.
 
-Other bits: `{name}` in any text becomes the recipient's name. Theme presets live in `src/config/themes.js`.
+`{name}` in any text becomes the recipient's name.
 
-### Who can change what
+## Live backend (Supabase): publish instantly, no redeploy
+
+Without it, the site works exactly as before. You edit in the browser, download `site-config.json`, commit it, and GitHub redeploys (about a minute). With it, the admin logs in by email and everything is live straight away.
+
+**One-time setup (about 5 minutes, free):**
+
+1. Go to [supabase.com](https://supabase.com) and create a free account, then **New project**. Any name and region; save the database password somewhere.
+2. In the project: **SQL Editor → New query**. Paste all of [`supabase/schema.sql`](supabase/schema.sql). **First change `you@example.com` on the last lines to your own email.** Then press **Run**.
+3. **Authentication → Sign In / Providers:** turn **off** "Allow new users to sign up" (only you should have an account).
+4. **Authentication → Users → Add user → Send invitation** (or "Create new user") with the same email.
+5. **Authentication → URL Configuration:** set **Site URL** to your site, e.g. `https://austinedearan-stack.github.io/friend-swebpage/`, and add the same address under **Redirect URLs**.
+6. **Project Settings → API:** copy the **Project URL** and the **anon / public** key into `src/config/backend.json`:
+   ```json
+   { "supabaseUrl": "https://abcd1234.supabase.co", "supabaseAnonKey": "eyJhbGciOi..." }
+   ```
+   Both values are meant to be public. The database rules in `schema.sql` decide who can change anything.
+7. Commit and push. Once deployed, open `…/#admin`, enter your email, and tap the link in the email. You're in.
+8. In **★ publish**, press **publish now** once. That copies the current words into the database.
+
+**How it behaves:**
+
+- **Visitors only ever read.** Only emails listed in the database's `admins` table can write. To add another admin, run `insert into public.admins (email) values ('them@example.com');` in the SQL editor and invite them under Authentication → Users.
+- **Words and page settings** go live when you press **publish now**. Visitors get them the next time they open the site.
+- **Announcements** go live the moment you save them. The board also refreshes itself every minute while it's open.
+- **If Supabase is unreachable**, visitors see the last copy they loaded, or the bundled `site-config.json` on a first visit. Nothing breaks.
+- **Free-tier note:** Supabase pauses free projects after about a week with no activity. If that happens, open the project in the Supabase dashboard and click Restore. The site keeps working from its fallback in the meantime.
+
+## Who can change what
 
 | Where | What it holds | Who can change it |
 |---|---|---|
-| `site-config.json` (published) | all words, live mode, default look | only you, by redeploying |
-| this browser (localStorage) | a visitor's own look, saved themes, your admin draft | that visitor, on that device |
-| share link (`#theme=…`) | **only the look** (colours, fonts, layout) | anyone can make one |
+| Supabase (if connected) | live words, page settings, announcements | only admin emails |
+| `site-config.json` | fallback words, page settings, starter announcements | only you, by redeploying |
+| this browser (localStorage) | a visitor's own look per page, saved themes, the admin's unpublished draft | that visitor, on that device |
+| share link (`#/page&theme=…`) | **only the look** (colours, fonts, layout) | anyone can make one |
 
-A link can never change the words or the mode. Mode/content URL parameters are ignored entirely, and visitor mode-switching is off unless you turn on `visitorCanSwitchMode`.
+A link can never change the words, the pages or the announcements.
 
-The `#admin` passphrase only keeps the editor out of sight. It isn't real security (it's a static site), and it doesn't need to be: anything done in someone's browser stays in that browser. Don't put anything truly private in `site-config.json`. The repo and the deployed JS are public, so anyone determined could read the text.
+"Off the menu" means hidden, not secret. On a public website, a determined person could still find the words. Don't put anything truly private on it.
+
+## Photos
+
+The announcement page uses five photos from `images/` (Pexels). `npm run optimize-images` crops and compresses them into `src/assets/photos/*.webp` (about 50 KB each). The full-size originals are git-ignored to keep the repo small. The two DeviantArt Rick & Morty images in `images/` aren't used: they carry the artists' watermark and signature, so the site uses original doodles instead.
 
 ## Deploy (GitHub Pages, free)
 
-1. Create a new repository on github.com (e.g. `checkin`). Private repos need a paid plan for Pages, so use public.
-2. In this folder:
-   ```bash
-   git init -b main
-   git add .
-   git commit -m "first check-in"
-   git remote add origin https://github.com/<you>/checkin.git
-   git push -u origin main
-   ```
-3. On GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-4. Watch the **Actions** tab. When it's green, the site is at `https://<you>.github.io/checkin/`.
-
-No routing config is needed (single page, relative asset paths). Cloudflare Pages / Netlify also work: build command `npm run build`, output folder `dist`.
-
-### Updating later
-
-Edit (or upload a new) `src/config/site-config.json` or any file, commit to `main`, and it redeploys automatically.
+Already set up: every push to `main` builds and publishes via `.github/workflows/deploy.yml`. In the repo settings, **Pages → Source** must be **GitHub Actions**. No routing config is needed (hash links, relative asset paths).
 
 ## Phone test checklist
 
-- [ ] Link opens fast on mobile data; no sideways scrolling
-- [ ] Greeting, start button and "skip to tomorrow" work
-- [ ] All 4 moods give a reply; "change my answer" works
-- [ ] Every tomorrow answer reacts; the closing note appears
-- [ ] Extras buttons and rock-paper-scissors (incl. best of three) work
-- [ ] Tap the title 5×, flip the polaroid, boop the heart sticker
-- [ ] "make it yours" opens as a bottom sheet; presets change the page; it's remembered after refresh
-- [ ] Share link opens the same look on another phone
-- [ ] `#admin` asks for the passphrase (then lock it again)
+- [ ] Plain link opens the check-in; `#/friends` and `#/announcements` open their pages; no sideways scrolling
+- [ ] Menu switches pages with the portal; the check-in tab isn't in the friends/announcements menu
+- [ ] Steps: start, next/back, the step dots, and the phone's back button all work; answers survive going back
+- [ ] All moods reply (the blue helper pops up); tomorrow answers react (portal gun zaps); extras and rock-paper-scissors work
+- [ ] Easter eggs: title ×5, flip the polaroid, boop the heart, poke the pickle, ask for lots of compliments
+- [ ] Announcements: filters, read more, countdowns, links open in a new tab
+- [ ] "make it yours" changes only the current page; it's remembered after refresh
+- [ ] `#admin` → login → edit a word → publish → shows on another phone

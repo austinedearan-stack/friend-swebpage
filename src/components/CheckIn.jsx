@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { fill } from '../lib/content.js'
 import { MoodIcon } from './Doodles.jsx'
+import { BlueHelper } from './RickMorty.jsx'
 import ResponseCard from './ResponseCard.jsx'
 
 export default function CheckIn({ copy, vars, eggs, pick }) {
@@ -18,6 +19,7 @@ export default function CheckIn({ copy, vars, eggs, pick }) {
       key: `${mood.id}-${n}`,
       text: fill(pick(`mood-${mood.id}`, mood.responses), vars),
       extra: n >= 3 ? fill(eggs.repeatPick, { ...vars, count: n }) : null,
+      helper: pick('helper', eggs.helperLines),
     })
   }
 
@@ -40,8 +42,16 @@ export default function CheckIn({ copy, vars, eggs, pick }) {
 
   return (
     <section id="checkin" className="section checkin" aria-labelledby="checkin-h">
-      <h2 id="checkin-h" className="section-title" data-edit="type:heading">{fill(c.heading, vars)}</h2>
-      <p className="section-sub">{fill(c.subheading, vars)}</p>
+      <div className="section-head">
+        <div>
+          <h2 id="checkin-h" className="section-title step-focus" tabIndex={-1} data-edit="type:heading">{fill(c.heading, vars)}</h2>
+          <p className="section-sub">{fill(c.subheading, vars)}</p>
+        </div>
+        <div className={`helper-wrap ${reply ? 'is-up' : ''}`} aria-hidden="true">
+          {reply && <span className="speech speech-helper hand" key={reply.key}>{reply.helper}</span>}
+          <BlueHelper size={58} className="doodle-helper" key={reply?.key || 'idle'} />
+        </div>
+      </div>
 
       <div className="mood-grid" role="radiogroup" aria-labelledby="checkin-h" ref={groupRef}>
         {c.moods.map((m, i) => {

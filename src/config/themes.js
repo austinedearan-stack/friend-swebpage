@@ -124,6 +124,32 @@ export const PRESETS = {
     deco: { pattern: 'none', texture: 0, stickers: false, doodles: false, tape: false, polaroids: false, tilt: 0 },
     motion: { level: 'subtle', decorative: false },
   },
+  // the friends page default: kraft paper, portal green, a lab notebook someone spilled things on
+  lab: {
+    label: 'Lab notebook', blurb: 'kraft paper, portal green, sticker shadows',
+    colors: {
+      bg: '#EEE6D3', surface: '#FFFDF5', surfaceAlt: '#E2F0C9', text: '#26332A', textMuted: '#566457',
+      accent: '#6DBE45', accent2: '#FFE07A', accent3: '#BDE3F0', buttonBg: '#8ED05C', buttonText: '#16241A',
+      border: '#D5C9AE', deco: '#3F8F2A',
+    },
+    type: { heading: 'patrick', body: 'nunito', baseSize: 17, headingScale: 1.05, headingWeight: 400, lineHeight: 1.6 },
+    layout: { radius: 10, shadow: 0.4, shadowStyle: 'hard', borderStyle: 'solid', borderWidth: 2, width: 880, gap: 1, density: 'cozy' },
+    deco: { pattern: 'grid', texture: 0.5, stickers: true, doodles: true, tape: true, polaroids: true, tilt: 1.1 },
+    motion: { level: 'playful', decorative: true },
+  },
+  // the announcements page look, taken from the neon photos
+  neon: {
+    label: 'Neon night', blurb: 'near-black, red & teal neon glow',
+    colors: {
+      bg: '#0B0A0C', surface: '#151216', surfaceAlt: '#211B20', text: '#F4EEEC', textMuted: '#ABA0A3',
+      accent: '#FF4D5A', accent2: '#3FE6D0', accent3: '#8EE04A', buttonBg: '#FF4D5A', buttonText: '#16080A',
+      border: '#2C2529', deco: '#3FE6D0',
+    },
+    type: { heading: 'grotesk', body: 'atkinson', baseSize: 17, headingScale: 1, headingWeight: 700, lineHeight: 1.6 },
+    layout: { radius: 14, shadow: 0.6, shadowStyle: 'soft', borderStyle: 'solid', borderWidth: 1, width: 1040, gap: 1, density: 'cozy' },
+    deco: { pattern: 'none', texture: 0.2, stickers: true, doodles: true, tape: false, polaroids: false, tilt: 0 },
+    motion: { level: 'playful', decorative: true },
+  },
 }
 
 export const PRESET_IDS = Object.keys(PRESETS)

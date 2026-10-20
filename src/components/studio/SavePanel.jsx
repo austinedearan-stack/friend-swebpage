@@ -7,7 +7,7 @@ const loadSaved = () => {
   return Array.isArray(list) ? list.filter((x) => x && typeof x.name === 'string').slice(0, 30) : []
 }
 
-export default function SavePanel({ theme, setTheme, toast }) {
+export default function SavePanel({ theme, setTheme, toast, page }) {
   const [saved, setSaved] = useState(loadSaved)
   const [name, setName] = useState('')
   const [link, setLink] = useState(null)
@@ -57,7 +57,7 @@ export default function SavePanel({ theme, setTheme, toast }) {
   }
 
   const makeLink = async () => {
-    const res = encodeThemeForUrl(theme)
+    const res = encodeThemeForUrl(theme, page)
     if (!res.ok) {
       setLink({ error: `this theme is too detailed for a link (${res.length} characters). use “download theme file” and send the file instead.` })
       return

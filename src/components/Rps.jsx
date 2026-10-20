@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { fill } from '../lib/content.js'
 import { randInt } from '../lib/util.js'
+import { Saucer } from './RickMorty.jsx'
 
 const MOVES = [
   { id: 'rock', label: 'Rock', emoji: '✊' },
@@ -62,7 +63,12 @@ export default function Rps({ copy, vars, pick, celebrate }) {
     <section id="game" className="section rps" aria-labelledby="rps-h">
       <div className="rps-card card" data-edit="colors:surface">
         <span className="tape tape-top" aria-hidden="true" />
-        <h2 id="rps-h" className="section-title" data-edit="type:heading">{fill(r.heading, vars)}</h2>
+        {match === 'win' && (
+          <div className="rps-flyby-lane" aria-hidden="true">
+            <Saucer className="rps-flyby" size={96} beam />
+          </div>
+        )}
+        <h2 id="rps-h" className="section-title step-focus" tabIndex={-1} data-edit="type:heading">{fill(r.heading, vars)}</h2>
         <p className="section-sub">{fill(r.intro, vars)}</p>
 
         <div className="rps-top">

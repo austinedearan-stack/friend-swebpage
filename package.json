@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/smoke.mjs",
-    "hash": "node scripts/hash-passphrase.mjs"
+    "test": "node tests/smoke.mjs && node tests/live.mjs",
+    "hash": "node scripts/hash-passphrase.mjs",
+    "optimize-images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.1.0",
@@ -18,6 +19,7 @@
     "@fontsource/nunito": "^5.1.0",
     "@fontsource/patrick-hand": "^5.1.0",
     "@fontsource/space-grotesk": "^5.1.0",
+    "@supabase/supabase-js": "^2.118.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

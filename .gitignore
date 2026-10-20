@@ -1,5 +1,8 @@
 node_modules
 dist
+dist-live
 tests/_shots.mjs
 *.log
 .DS_Store
+# original full-size photos (the site uses the compressed copies in src/assets/photos)
+images/

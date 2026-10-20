@@ -1,20 +1,44 @@
 {
-  "version": 1,
+  "version": 2,
   "admin": {
     "passphraseHash": "1f594209378dce842f1d3320e63ee16fb04d2ad839ea2c5fbfa1e4306835031d"
   },
   "site": {
     "title": "Austine checking in",
-    "activeMode": "personal",
-    "visitorCanSwitchMode": false,
-    "defaultTheme": {
-      "preset": "scrapbook",
-      "overrides": {}
+    "homePage": "checkin"
+  },
+  "pages": {
+    "checkin": {
+      "enabled": true,
+      "inNav": false,
+      "navLabel": "check-in",
+      "theme": {
+        "preset": "scrapbook",
+        "overrides": {}
+      }
+    },
+    "friends": {
+      "enabled": true,
+      "inNav": true,
+      "navLabel": "friends",
+      "theme": {
+        "preset": "lab",
+        "overrides": {}
+      }
+    },
+    "announcements": {
+      "enabled": true,
+      "inNav": true,
+      "navLabel": "announcements",
+      "kicker": "the notice board",
+      "heading": "announcements",
+      "intro": "important stuff, slightly less important stuff, and things nobody asked for. check back now and then.",
+      "emptyText": "nothing to announce right now. suspicious, honestly.",
+      "caughtUp": "you are all caught up. go drink some water."
     }
   },
   "modes": {
     "personal": {
-      "label": "for Brenda",
       "recipientName": "Brenda",
       "welcome": {
         "kicker": "a tiny corner of the internet, for {name}",
@@ -190,7 +214,6 @@
       }
     },
     "friend": {
-      "label": "friend mode",
       "recipientName": "you",
       "welcome": {
         "kicker": "official check-in department",
@@ -372,6 +395,28 @@
       }
     }
   },
+  "announcements": [
+    {
+      "id": "welcome",
+      "title": "welcome to the notice board",
+      "body": "this is where the important stuff lives. events, updates, reminders, and the occasional nonsense.\n\ncheck back now and then. it changes.",
+      "category": "info",
+      "pinned": true,
+      "published": true,
+      "image": "neon-red",
+      "order": 0
+    },
+    {
+      "id": "psa",
+      "title": "public service announcement",
+      "body": "drink some water. that is it. that is the announcement.",
+      "category": "fun",
+      "pinned": false,
+      "published": true,
+      "image": "none",
+      "order": 1
+    }
+  ],
   "eggs": {
     "titleClicks": 5,
     "titleSecret": "okay, you found the secret. here it is: you're one of my favourite people. don't make it weird.",
@@ -395,6 +440,18 @@
       "wheee, off we go"
     ],
     "repeatPick": "you've picked that {count} times. i believe you, i promise.",
-    "footer": "made by Austine, just for you. "
+    "footer": "made by Austine, just for you. ",
+    "helperLines": [
+      "ooh, can do!",
+      "noted! existence is pain, but noted!",
+      "i am here to help! look at me!",
+      "got it! that one goes on the record."
+    ],
+    "pickleLines": [
+      "you found the pickle.",
+      "i turned myself into a pickle!",
+      "funniest thing ever, right?",
+      "stop poking the pickle."
+    ]
   }
 }
