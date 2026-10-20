@@ -18,10 +18,10 @@ React + Vite, plain CSS, fonts bundled locally. There's an optional free live ba
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # production build → dist/
-npm test           # after a build: clicks through every page + the admin panel in headless Chrome
+npm test           # clicks through every page + the admin panel in headless Chrome
 ```
 
-(Tests need a one-time `npx playwright install chromium-headless-shell`. `npm test` also builds a second copy wired to a fake Supabase to test the live mode.)
+(Tests need a one-time `npx playwright install chromium-headless-shell`. The tests build their own copies: one with the backend off, one wired to a fake Supabase. They never touch your real project.)
 
 ## The admin panel
 
@@ -42,15 +42,17 @@ Without it, the site works exactly as before. You edit in the browser, download 
 1. Go to [supabase.com](https://supabase.com) and create a free account, then **New project**. Any name and region; save the database password somewhere.
 2. In the project: **SQL Editor → New query**. Paste all of [`supabase/schema.sql`](supabase/schema.sql). **First change `you@example.com` on the last lines to your own email.** Then press **Run**.
 3. **Authentication → Sign In / Providers:** turn **off** "Allow new users to sign up" (only you should have an account).
-4. **Authentication → Users → Add user → Send invitation** (or "Create new user") with the same email.
+4. **Authentication → Users → Add user → Create new user** with the same email (tick **Auto Confirm User**; the password is never used).
 5. **Authentication → URL Configuration:** set **Site URL** to your site, e.g. `https://austinedearan-stack.github.io/friend-swebpage/`, and add the same address under **Redirect URLs**.
-6. **Project Settings → API:** copy the **Project URL** and the **anon / public** key into `src/config/backend.json`:
+6. Put two values into `src/config/backend.json`:
+   - **supabaseUrl:** the project address, `https://<project-id>.supabase.co` (Project Settings → Data API, or the **Connect** button). Use the address, not a key.
+   - **supabaseAnonKey:** the public key (Project Settings → API Keys). Either the `sb_publishable_…` key or the legacy `anon` key works.
    ```json
-   { "supabaseUrl": "https://abcd1234.supabase.co", "supabaseAnonKey": "eyJhbGciOi..." }
+   { "supabaseUrl": "https://abcd1234.supabase.co", "supabaseAnonKey": "sb_publishable_..." }
    ```
    Both values are meant to be public. The database rules in `schema.sql` decide who can change anything.
 7. Commit and push. Once deployed, open `…/#admin`, enter your email, and tap the link in the email. You're in.
-8. In **★ publish**, press **publish now** once. That copies the current words into the database.
+8. In **★ publish**, press **publish now** once. That copies the current words into the database (until then, visitors get the words bundled in `site-config.json`).
 
 **How it behaves:**
 
