@@ -12,7 +12,8 @@ const URL_BASE = (import.meta.env.VITE_SUPABASE_URL || BACKEND.supabaseUrl || ''
 const ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY || BACKEND.supabaseAnonKey || '').trim()
 const AUTH_STORAGE_KEY = 'aci.auth'
 
-export const backendEnabled = /^https:\/\/[^\s/]+$/.test(URL_BASE) && ANON_KEY.length > 20
+// VITE_BACKEND=off builds a copy without the backend (the tests use it)
+export const backendEnabled = import.meta.env.VITE_BACKEND !== 'off' && /^https:\/\/[^\s/]+$/.test(URL_BASE) && ANON_KEY.length > 20
 
 let clientPromise = null
 function client() {
@@ -40,7 +41,7 @@ export function mightHaveSession() {
 
 async function rest(path) {
   const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort(), 8000)
+  const timer = setTimeout(() => ctrl.abort(), 15000) // generous: slow mobile connections
   try {
     const res = await fetch(`${URL_BASE}/rest/v1/${path}`, {
       headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },

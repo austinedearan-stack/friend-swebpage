@@ -1,6 +1,7 @@
 node_modules
 dist
 dist-live
+dist-test
 tests/_shots.mjs
 *.log
 .DS_Store

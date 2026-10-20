@@ -94,7 +94,7 @@ export default function PublishPanel({ config, draftRaw, theme, updateDraft, dis
 
       <div className="inline-row wrap">
         {live && (
-          <button className="btn btn-primary btn-small" onClick={publish} disabled={busy || !draftRaw}>
+          <button className="btn btn-primary btn-small" onClick={publish} disabled={busy}>
             {busy ? 'publishing…' : '★ publish now'}
           </button>
         )}
