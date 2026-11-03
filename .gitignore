@@ -7,3 +7,7 @@ tests/_shots.mjs
 .DS_Store
 # original full-size photos (the site uses the compressed copies in src/assets/photos)
 images/
+
+# local notes (not published)
+CHANGES-SUMMARY.md
+NEXT-SESSION.md
